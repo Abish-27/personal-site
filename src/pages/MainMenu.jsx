@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Character from "./Character";
 import Inventory from "./Inventory";
 import QuestLog from "./QuestLog";
+import Arcade from "./Arcade";
 
 
 
@@ -61,6 +62,10 @@ export default function MainMenu() {
   <Inventory />
 ) : selected === "quests" ? (
   <QuestLog />
+) : selected === "inventory" ? (
+  <Inventory />
+) : selected === "arcade" ? (
+  <Arcade />
 ) : (
   <div style={{ opacity: 0.85 }}>
     <h2 style={{ marginTop: 0 }}>

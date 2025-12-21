@@ -3,23 +3,30 @@ import Character from "./Character";
 import Inventory from "./Inventory";
 import QuestLog from "./QuestLog";
 import Arcade from "./Arcade";
+import Tutorial from "./Tutorial";
+import PlayHub from "./PlayHub";
+
 
 
 
 export default function MainMenu() {
   const menu = useMemo(
-    () => [
-      { key: "start", label: "Start" },
-      { key: "character", label: "Character" },
-      { key: "quests", label: "Quest Log" },
-      { key: "inventory", label: "Inventory" },
-      { key: "arcade", label: "Arcade" },
-      { key: "guild", label: "Guild Hall" },
-    ],
-    []
-  );
+  () => [
+    { key: "tutorial", label: "Tutorial" },
+    { key: "character", label: "Character" },
+    { key: "quests", label: "Quest Log" },
+    { key: "inventory", label: "Inventory" },
+    { key: "arcade", label: "Arcade" },
+    { key: "guild", label: "Guild Hall" },
+    { key: "play", label: "Play" },
+  ],
+  []
+);
 
-  const [selected, setSelected] = useState("character");
+
+  const [selected, setSelected] = useState("tutorial");
+  const [lastNonPlay, setLastNonPlay] = useState("tutorial");
+
 
   return (
     <div style={{ minHeight: "100vh", background: "#0b0b0b", color: "#f5f5f5", padding: 24 }}>
@@ -32,7 +39,14 @@ export default function MainMenu() {
             {menu.map((item) => (
               <button
                 key={item.key}
-                onClick={() => setSelected(item.key)}
+                onClick={() => {
+                    if (item.key === "play") {
+                        setLastNonPlay(selected === "play" ? lastNonPlay : selected);
+                        setSelected("play");
+                    } else {
+                        setSelected(item.key);
+                    }
+                    }}
                 style={{
                   background: "transparent",
                   color: "#f5f5f5",
@@ -56,16 +70,23 @@ export default function MainMenu() {
 
         {/* Right panel */}
         <div style={{ border: "4px solid #f5f5f5", padding: 16, minHeight: 420 }}>
-          {selected === "character" ? (
+          {selected === "tutorial" ? (
+  <Tutorial />
+) : selected === "character" ? (
   <Character />
 ) : selected === "inventory" ? (
   <Inventory />
 ) : selected === "quests" ? (
   <QuestLog />
-) : selected === "inventory" ? (
-  <Inventory />
 ) : selected === "arcade" ? (
   <Arcade />
+) : selected === "guild" ? (
+  <GuildHall />
+) : selected === "play" ? (
+  <PlayHub
+    onExit={() => setSelected(lastNonPlay)}
+    onNavigate={(key) => setSelected(key)}
+  />
 ) : (
   <div style={{ opacity: 0.85 }}>
     <h2 style={{ marginTop: 0 }}>
@@ -74,6 +95,7 @@ export default function MainMenu() {
     <p>Placeholder screen. We’ll fill this next.</p>
   </div>
 )}
+
 
         </div>
       </div>

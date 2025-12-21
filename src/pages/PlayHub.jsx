@@ -18,16 +18,77 @@ export default function PlayHub({ onNavigate, onExit }) {
   const worldRef = useRef(null);
 
   const objects = useMemo(
-    () => [
-      { id: "sign", name: "Signpost", key: "tutorial", x: 10, y: 9, color: "#caa46a", prompt: "Read Guide" },
-      { id: "cabin", name: "Cabin", key: "character", x: 4, y: 4, color: "#8b5a2b", prompt: "Enter Cabin (Character)" },
-      { id: "shrine", name: "Shrine", key: "quests", x: 16, y: 4, color: "#9aa0a6", prompt: "Inspect Shrine (Quest Log)" },
-      { id: "chest", name: "Chest", key: "inventory", x: 4, y: 12, color: "#b58b2a", prompt: "Open Chest (Inventory)" },
-      { id: "portal", name: "Portal", key: "arcade", x: 16, y: 12, color: "#6d5bd0", prompt: "Enter Portal (Arcade)" },
-      { id: "mail", name: "Mailbox", key: "guild", x: 10, y: 3, color: "#d34b4b", prompt: "Send Message (Guild Hall)" },
-    ],
-    []
-  );
+  () => [
+    {
+      id: "sign",
+      name: "Signpost",
+      label: "Guide",
+      glyph: "📜",
+      key: "tutorial",
+      x: 10,
+      y: 9,
+      color: "#caa46a",
+      prompt: "Read Guide",
+    },
+    {
+      id: "cabin",
+      name: "Cabin",
+      label: "Cabin",
+      glyph: "🏕️",
+      key: "character",
+      x: 4,
+      y: 4,
+      color: "#8b5a2b",
+      prompt: "Enter Cabin (Character)",
+    },
+    {
+      id: "shrine",
+      name: "Shrine",
+      label: "Quest Shrine",
+      glyph: "🌳",
+      key: "quests",
+      x: 16,
+      y: 4,
+      color: "#9aa0a6",
+      prompt: "Inspect Shrine (Quest Log)",
+    },
+    {
+      id: "chest",
+      name: "Chest",
+      label: "Inventory",
+      glyph: "🎒",
+      key: "inventory",
+      x: 4,
+      y: 12,
+      color: "#b58b2a",
+      prompt: "Open Chest (Inventory)",
+    },
+    {
+      id: "portal",
+      name: "Portal",
+      label: "Arcade Portal",
+      glyph: "🕹️",
+      key: "arcade",
+      x: 16,
+      y: 12,
+      color: "#6d5bd0",
+      prompt: "Enter Portal (Arcade)",
+    },
+    {
+      id: "mail",
+      name: "Mailbox",
+      label: "Guild Post",
+      glyph: "✉️",
+      key: "guild",
+      x: 10,
+      y: 3,
+      color: "#d34b4b",
+      prompt: "Send Message (Guild Hall)",
+    },
+  ],
+  []
+);
+
 
   // Obstacles: outer wall of trees + a few extra blocks.
   const obstacles = useMemo(() => {
@@ -220,54 +281,230 @@ export default function PlayHub({ onNavigate, onExit }) {
         })}
 
         {/* Interactable objects */}
-        {objects.map((o) => {
-          const isActive = activeObject?.id === o.id;
-          return (
-            <div
-              key={o.id}
-              onClick={() => handleObjectClick(o)}
-              title={`${o.name} → ${o.key}`}
-              style={{
-                position: "absolute",
-                left: o.x * TILE,
-                top: o.y * TILE,
-                width: TILE,
-                height: TILE,
-                background: o.color,
-                border: isActive ? "2px solid #7cff6b" : "1px solid rgba(245,245,245,0.65)",
-                boxSizing: "border-box",
-                cursor: "pointer",
-              }}
-            />
-          );
-        })}
+{objects.map((o) => {
+  const isActive = activeObject?.id === o.id;
+
+  return (
+    <div
+      key={o.id}
+      style={{
+        position: "absolute",
+        left: o.x * TILE,
+        top: o.y * TILE,
+        width: TILE,
+        height: TILE,
+      }}
+    >
+      {/* Object tile */}
+      <div
+        onClick={() => handleObjectClick(o)}
+        title={`${o.name} → ${o.key}`}
+        style={{
+          width: TILE,
+          height: TILE,
+          background: o.color,
+          border: isActive ? "2px solid #7cff6b" : "1px solid rgba(245,245,245,0.65)",
+          boxSizing: "border-box",
+          cursor: "pointer",
+          boxShadow: isActive ? "0 0 10px rgba(124,255,107,0.65)" : "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+        }}
+      >
+        {o.glyph}
+      </div>
+
+      {/* Label */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: TILE + 4,
+          transform: "translateX(-50%)",
+          whiteSpace: "nowrap",
+          fontSize: 10,
+          padding: "2px 6px",
+          border: "1px solid rgba(245,245,245,0.75)",
+          background: "rgba(11,11,11,0.85)",
+          color: "#f5f5f5",
+          opacity: isActive ? 1 : 0.45,
+          filter: isActive ? "none" : "grayscale(20%)",
+          boxShadow: isActive ? "0 0 8px rgba(124,255,107,0.35)" : "none",
+          pointerEvents: "none",
+        }}
+      >
+        {o.label}
+      </div>
+    </div>
+  );
+})}
+
 
         {/* Player */}
-        <div
-          style={{
-            position: "absolute",
-            left: player.x * TILE,
-            top: player.y * TILE,
-            width: TILE,
-            height: TILE,
-            background: "#2a7cff", // tunic colour for v1
-            border: "1px solid rgba(245,245,245,0.85)",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Tiny “face” indicator based on facing */}
-          <div
-            style={{
-              position: "absolute",
-              width: 6,
-              height: 6,
-              background: "#f5f5f5",
-              opacity: 0.9,
-              left: player.facing === "left" ? 4 : player.facing === "right" ? TILE - 10 : (TILE - 6) / 2,
-              top: player.facing === "up" ? 4 : player.facing === "down" ? TILE - 10 : (TILE - 6) / 2,
-            }}
-          />
-        </div>
+        {/* Player */}
+<div
+  style={{
+    position: "absolute",
+    left: player.x * TILE,
+    top: player.y * TILE,
+    width: TILE,
+    height: TILE,
+    boxSizing: "border-box",
+  }}
+>
+  {/* shadow */}
+  <div
+    style={{
+      position: "absolute",
+      left: "50%",
+      bottom: 2,
+      transform: "translateX(-50%)",
+      width: Math.round(TILE * 0.7),
+      height: Math.round(TILE * 0.22),
+      background: "rgba(0,0,0,0.35)",
+      borderRadius: 999,
+    }}
+  />
+
+  {/* body container */}
+  <div
+    style={{
+      position: "absolute",
+      left: "50%",
+      top: 2,
+      transform: "translateX(-50%)",
+      width: Math.round(TILE * 0.62),
+      height: Math.round(TILE * 0.82),
+      imageRendering: "pixelated",
+    }}
+  >
+    {/* HAT (green) */}
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: "100%",
+        height: Math.round(TILE * 0.18),
+        background: "#2bbf4b",
+        border: "1px solid rgba(245,245,245,0.65)",
+        boxSizing: "border-box",
+      }}
+    />
+
+    {/* HAT TIP (directional) */}
+    <div
+      style={{
+        position: "absolute",
+        width: Math.round(TILE * 0.16),
+        height: Math.round(TILE * 0.16),
+        background: "#2bbf4b",
+        border: "1px solid rgba(245,245,245,0.55)",
+        boxSizing: "border-box",
+        left:
+          player.facing === "left"
+            ? -Math.round(TILE * 0.08)
+            : player.facing === "right"
+              ? Math.round(TILE * 0.62) - Math.round(TILE * 0.08)
+              : Math.round(TILE * 0.23),
+        top:
+          player.facing === "up"
+            ? -Math.round(TILE * 0.06)
+            : player.facing === "down"
+              ? Math.round(TILE * 0.16)
+              : Math.round(TILE * 0.06),
+      }}
+    />
+
+    {/* FACE (skin) */}
+    <div
+      style={{
+        position: "absolute",
+        left: Math.round(TILE * 0.07),
+        top: Math.round(TILE * 0.18),
+        width: Math.round(TILE * 0.48),
+        height: Math.round(TILE * 0.22),
+        background: "#f2c9a0",
+        border: "1px solid rgba(245,245,245,0.55)",
+        boxSizing: "border-box",
+      }}
+    />
+
+    {/* EYES (directional) */}
+    <div
+      style={{
+        position: "absolute",
+        width: 3,
+        height: 3,
+        background: "#0b0b0b",
+        left:
+          player.facing === "left"
+            ? 4
+            : player.facing === "right"
+              ? Math.round(TILE * 0.48) - 2
+              : Math.round(TILE * 0.22),
+        top: Math.round(TILE * 0.25),
+        opacity: 0.9,
+      }}
+    />
+
+    {/* TUNIC (green) */}
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: Math.round(TILE * 0.40),
+        width: "100%",
+        height: Math.round(TILE * 0.34),
+        background: "#1f8f3a",
+        border: "1px solid rgba(245,245,245,0.65)",
+        boxSizing: "border-box",
+      }}
+    />
+
+    {/* BELT */}
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: Math.round(TILE * 0.56),
+        width: "100%",
+        height: 3,
+        background: "#7a4b22",
+        opacity: 0.95,
+      }}
+    />
+
+    {/* BOOTS */}
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        bottom: 0,
+        width: "48%",
+        height: Math.round(TILE * 0.14),
+        background: "#3a2a1a",
+        border: "1px solid rgba(245,245,245,0.55)",
+        boxSizing: "border-box",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        right: 0,
+        bottom: 0,
+        width: "48%",
+        height: Math.round(TILE * 0.14),
+        background: "#3a2a1a",
+        border: "1px solid rgba(245,245,245,0.55)",
+        boxSizing: "border-box",
+      }}
+    />
+  </div>
+</div>
+
       </div>
 
       {/* Prompt bar */}
